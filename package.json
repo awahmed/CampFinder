@@ -1,0 +1,23 @@
+{
+  "name": "campfinder",
+  "version": "1.0.0",
+  "description": "rate Camping Grounds",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/awahmed/CampFinder.git"
+  },
+  "author": "Abdul Ahmed",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/awahmed/CampFinder/issues"
+  },
+  "homepage": "https://github.com/awahmed/CampFinder#readme",
+  "dependencies": {
+    "ejs": "^3.1.2",
+    "express": "^4.17.1"
+  }
+}
