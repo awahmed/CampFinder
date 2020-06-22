@@ -2,48 +2,17 @@ var express = require("express");
 var app = express();
 var bodyparser = require("body-parser");
 var mongoose = require("mongoose");
+var Campground = require("./models/campground");
+var seedDB = require("./seeds");
 
 
-
+seedDB();
 mongoose.set('useUnifiedTopology', true);
 mongoose.connect("mongodb://localhost:27017/campdb", {useNewUrlParser: true});
 app.use(bodyparser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
-var campgroundSchema = new mongoose.Schema({
-	name: String,
-	image: String
-});
 
-var Campground = mongoose.model("Campground", campgroundSchema);
-
-// Campground.create(
-// {
-// 	name:"Big Yosemite", 
-// 	image:"https://images.unsplash.com/flagged/photo-1551032327-63456bda8d00?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=967&q=80"
-
-// }, function(err,campground){
-// 	if(err){
-// 		console.log(err);
-// 	}else{
-// 		console.log("newly created campground");
-// 		console.log(campground);
-// 	}
-// });
-
-/*var campgrounds =[{name:"Little Yosemite", image:"https://image.shutterstock.com/image-photo/lush-green-hills-wildflowers-oak-600w-681494164.jpg"},
-					  {name:"Santa Cruz beach", image:"https://image.shutterstock.com/image-photo/lush-green-hills-wildflowers-oak-600w-681494164.jpg"},
-	                  {name:"Mission peak", image:"https://image.shutterstock.com/image-photo/lush-green-hills-wildflowers-oak-600w-681494164.jpg"},
-	                  {name:"Mission peak", image:"https://image.shutterstock.com/image-photo/lush-green-hills-wildflowers-oak-600w-681494164.jpg"},
-	                  {name:"Mission peak", image:"https://image.shutterstock.com/image-photo/lush-green-hills-wildflowers-oak-600w-681494164.jpg"},
-	                  {name:"Mission peak", image:"https://image.shutterstock.com/image-photo/lush-green-hills-wildflowers-oak-600w-681494164.jpg"},
-	                  {name:"Mission peak", image:"https://image.shutterstock.com/image-photo/lush-green-hills-wildflowers-oak-600w-681494164.jpg"},
-	                  {name:"Mission peak", image:"https://image.shutterstock.com/image-photo/lush-green-hills-wildflowers-oak-600w-681494164.jpg"},
-	                  {name:"Mission peak", image:"https://image.shutterstock.com/image-photo/lush-green-hills-wildflowers-oak-600w-681494164.jpg"},
-	                  {name:"Mission peak", image:"https://image.shutterstock.com/image-photo/lush-green-hills-wildflowers-oak-600w-681494164.jpg"},
-	                  {name:"Mission peak", image:"https://image.shutterstock.com/image-photo/lush-green-hills-wildflowers-oak-600w-681494164.jpg"},
-	                  {name:"Mission peak", image:"https://image.shutterstock.com/image-photo/lush-green-hills-wildflowers-oak-600w-681494164.jpg"}
-					 ]*/
 
 
 app.get("/", function(req,res){
@@ -67,7 +36,8 @@ app.post("/campgrounds",function(req,res){
 	//res.send("you hit campgrounds post route");
 	var name = req.body.addname;
 	var image = req.body.addimage;
-	var newCampground = {name: name,image: image};
+	var description = req.body.adddesc;
+	var newCampground = {name: name, image: image, description: description};
 	//add campground to db
 	Campground.create(newCampground, function(err,insertedCampground){
 		if (err) {
@@ -86,6 +56,15 @@ app.get("/campgrounds/new",function(req,res){
 
 });
 
+app.get("/campgrounds/:id", function(req,res){
+	Campground.findById(req.params.id).populate("comments").exec(function(err,foundCampground){
+		if(err){
+			console.log(err);
+		}else{
+			res.render("showcampground",{campground: foundCampground});
+		}
+	});
+});
 
 
 app.listen(3000, function(){
