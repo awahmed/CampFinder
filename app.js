@@ -3,6 +3,8 @@ var app = express();
 var bodyparser = require("body-parser");
 var mongoose = require("mongoose");
 var Campground = require("./models/campground");
+var Comment = require("./models/comment");
+
 var seedDB = require("./seeds");
 
 
@@ -25,7 +27,7 @@ app.get("/campgrounds",function(req,res){
 		if(err){
 			console.log(err);
 		}else{
-			res.render("campgrounds",{campgrounds:Allcampgrounds});
+			res.render("campgrounds/campgrounds",{campgrounds:Allcampgrounds});
 		}
 	});
 });
@@ -43,16 +45,14 @@ app.post("/campgrounds",function(req,res){
 		if (err) {
 			console.log(err);
 		}else{
+			console.log("1 campground added");
 			res.redirect("/campgrounds");
 		}
 	})
-
-	
-
 });
 
 app.get("/campgrounds/new",function(req,res){
-	res.render("newcamp.ejs");
+	res.render("campgrounds/newcamp.ejs");
 
 });
 
@@ -61,12 +61,43 @@ app.get("/campgrounds/:id", function(req,res){
 		if(err){
 			console.log(err);
 		}else{
-			res.render("showcampground",{campground: foundCampground});
+			res.render("campgrounds/showcampground",{campground: foundCampground});
 		}
 	});
 });
 
+//Comments routes==========================================================
 
+app.get("/campgrounds/:id/comments/new",function(req,res){
+	Campground.findById(req.params.id, function(err,campground){
+		if(err){
+			console.log(err);
+		}else{
+			res.render("comments/new",{campground: campground});
+		}
+	})
+});
+
+app.post("/campgrounds/:id/comments/new",function(req,res){
+	Campground.findById(req.params.id,function(err,campground){
+		if (err) {
+			console.log(err);
+			res.redirect("/campgrounds");
+		}else{
+			Comment.create(req.body.comment,function(err,comment){
+				if(err){
+					console.log(err);
+				}else{
+					campground.comments.push(comment);
+					campground.save();
+					res.redirect('/campgrounds/'+campground._id);
+				}
+			})
+		}
+	})
+})
+
+//=========================================================================
 app.listen(3000, function(){
 	console.log("Campfinder server is on");
 });
